@@ -1,0 +1,74 @@
+<Window x:Class="SportCenterManament_PRN.Views.ManagerMainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Quản lý Trung tâm - Manager Portal" 
+        Height="700" 
+        Width="1050" 
+        WindowStartupLocation="CenterScreen"
+        Background="#F9FAFB"
+        FontFamily="Segoe UI"
+        Loaded="Window_Loaded">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="64"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="#1E40AF" Padding="20,0">
+            <Grid>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="SPORTS CENTER" 
+                               FontSize="18" 
+                               FontWeight="Bold" 
+                               Foreground="#FFFFFF" 
+                               VerticalAlignment="Center" 
+                               Margin="0,0,12,0"/>
+                    <Border Background="#3B82F6" CornerRadius="4" Padding="8,3" VerticalAlignment="Center">
+                        <TextBlock Text="MANAGER PORTAL" FontSize="11" FontWeight="SemiBold" Foreground="#FFFFFF"/>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                        <TextBlock x:Name="txtUserName" Text="Manager Name" FontSize="13" FontWeight="SemiBold" Foreground="#FFFFFF" HorizontalAlignment="Right"/>
+                        <TextBlock x:Name="txtUserRole" Text="CenterManager" FontSize="11" Foreground="#BFDBFE" HorizontalAlignment="Right"/>
+                    </StackPanel>
+
+                    <Button x:Name="btnLogout" 
+                            Content="Đăng xuất" 
+                            Background="#DC2626" 
+                            Foreground="#FFFFFF" 
+                            FontWeight="Medium" 
+                            FontSize="12" 
+                            Padding="14,6" 
+                            BorderThickness="0" 
+                            Cursor="Hand" 
+                            Click="btnLogout_Click">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="4"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="24">
+            <Border Background="#FFFFFF" CornerRadius="8" Padding="24" BorderBrush="#E5E7EB" BorderThickness="1">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock Text="HỆ THỐNG QUẢN TRỊ TRUNG TÂM THỂ THAO" 
+                               FontSize="20" 
+                               FontWeight="Bold" 
+                               Foreground="#1F2937" 
+                               HorizontalAlignment="Center" 
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="Chào mừng Quản lý trung tâm đã đăng nhập thành công vào hệ thống." 
+                               FontSize="14" 
+                               Foreground="#6B7280" 
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

@@ -18,7 +18,7 @@ namespace SportCenterManament_PRN.Services.AuthService
                 Password = password
             };
 
-            LoginResultViewModel result = await LoginCenterManagerAsync(info);
+            LoginResultViewModel result = await LoginByEmailAsync(info);
             return result.Success;
         }
 
@@ -28,6 +28,27 @@ namespace SportCenterManament_PRN.Services.AuthService
         }
 
         public async Task<LoginResultViewModel> LoginByRoleAsync(LoginViewModel info, string roleName)
+        {
+            LoginResultViewModel result = await LoginByEmailAsync(info);
+            if (!result.Success)
+            {
+                return result;
+            }
+
+            if (!string.Equals(result.Role, roleName, StringComparison.OrdinalIgnoreCase))
+            {
+                UserSession.Clear();
+                return new LoginResultViewModel
+                {
+                    Success = false,
+                    Message = $"Quyền truy cập bị từ chối. Phần mềm quản trị chỉ dành riêng cho {roleName}."
+                };
+            }
+
+            return result;
+        }
+
+        public async Task<LoginResultViewModel> LoginByEmailAsync(LoginViewModel info)
         {
             try
             {
@@ -44,19 +65,11 @@ namespace SportCenterManament_PRN.Services.AuthService
 
                 await using (SportsCenterDbContext context = new SportsCenterDbContext())
                 {
-                    Role? role = await context.Roles.FirstOrDefaultAsync(q => q.Name == roleName);
-                    if (role == null)
-                    {
-                        return new LoginResultViewModel
-                        {
-                            Success = false,
-                            Message = $"Hệ thống chưa thiết lập vai trò {roleName}."
-                        };
-                    }
-
                     Account? account = await context.Accounts
                         .Include(q => q.Role)
                         .Include(q => q.CenterManager)
+                        .Include(q => q.Coach)
+                        .Include(q => q.Member)
                         .FirstOrDefaultAsync(q => q.Email.ToLower() == normalizedEmail);
 
                     if (account == null)
@@ -124,28 +137,33 @@ namespace SportCenterManament_PRN.Services.AuthService
                         };
                     }
 
-                    if (account.RoleId != role.Id && !string.Equals(account.Role?.Name, roleName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return new LoginResultViewModel
-                        {
-                            Success = false,
-                            Message = $"Quyền truy cập bị từ chối. Phần mềm quản trị chỉ dành riêng cho {roleName}."
-                        };
-                    }
-
                     account.FailedLoginCount = 0;
                     account.UpdatedAt = DateTime.UtcNow;
                     await context.SaveChangesAsync();
 
                     string tokenValue = Guid.NewGuid().ToString();
 
+                    string displayName = account.Email;
+                    if (account.CenterManager != null && !string.IsNullOrWhiteSpace(account.CenterManager.FullName))
+                    {
+                        displayName = account.CenterManager.FullName;
+                    }
+                    else if (account.Coach != null && !string.IsNullOrWhiteSpace(account.Coach.FullName))
+                    {
+                        displayName = account.Coach.FullName;
+                    }
+                    else if (account.Member != null && !string.IsNullOrWhiteSpace(account.Member.FullName))
+                    {
+                        displayName = account.Member.FullName;
+                    }
+
+                    string roleName = account.Role?.Name ?? "Member";
+
                     UserSession.AccessToken = Guid.Parse(tokenValue);
                     UserSession.AccountId = account.Id;
                     UserSession.Email = account.Email;
-                    UserSession.FullName = !string.IsNullOrWhiteSpace(account.CenterManager?.FullName)
-                                           ? account.CenterManager.FullName
-                                           : account.Email;
-                    UserSession.RoleName = account.Role?.Name ?? roleName;
+                    UserSession.FullName = displayName;
+                    UserSession.RoleName = roleName;
 
                     return new LoginResultViewModel
                     {
@@ -154,8 +172,8 @@ namespace SportCenterManament_PRN.Services.AuthService
                         AccessToken = tokenValue,
                         AccountId = account.Id,
                         Email = account.Email,
-                        FullName = UserSession.FullName,
-                        Role = UserSession.RoleName
+                        FullName = displayName,
+                        Role = roleName
                     };
                 }
             }
@@ -166,9 +184,6 @@ namespace SportCenterManament_PRN.Services.AuthService
                     Success = false,
                     Message = $"Lỗi kết nối hoặc xử lý: {ex.Message}"
                 };
-            }
-            finally
-            {
             }
         }
 

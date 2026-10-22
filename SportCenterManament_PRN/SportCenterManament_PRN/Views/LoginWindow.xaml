@@ -128,12 +128,16 @@
                         Click="btnLogin_Click" 
                         Margin="0,4,0,10"/>
 
-                <TextBlock Text="* Chỉ tài khoản Quản lý trung tâm (CenterManager) mới có quyền truy cập." 
-                           FontSize="11" 
-                           Foreground="#9CA3AF" 
-                           TextWrapping="Wrap" 
-                           TextAlignment="Center" 
-                           Margin="0,10,0,0"/>
+                <Button x:Name="btnOpenRegister" 
+                        Content="Chưa có tài khoản? Đăng ký ngay" 
+                        Background="Transparent" 
+                        Foreground="#2563EB" 
+                        BorderThickness="0" 
+                        FontSize="13" 
+                        Cursor="Hand" 
+                        Click="btnOpenRegister_Click" 
+                        HorizontalAlignment="Center" 
+                        Margin="0,6,0,0"/>
             </StackPanel>
         </Border>
     </Grid>

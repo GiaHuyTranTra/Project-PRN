@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SportCenterManament_PRN.DataAccess.Entities;
 using SportCenterManament_PRN.ViewModels.Account;
+using SportCenterManament_PRN.ViewModels.Auth;
 
 namespace SportCenterManament_PRN.Services.AccountService
 {
@@ -28,6 +29,125 @@ namespace SportCenterManament_PRN.Services.AccountService
             catch (Exception)
             {
                 return false;
+            }
+        }
+
+        public async Task<(bool Success, string Message)> RegisterAccountAsync(RegisterViewModel info)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(info.Username))
+                {
+                    return (false, "Vui lòng nhập Username.");
+                }
+
+                if (string.IsNullOrWhiteSpace(info.Email))
+                {
+                    return (false, "Vui lòng nhập Email.");
+                }
+
+                if (string.IsNullOrWhiteSpace(info.Password))
+                {
+                    return (false, "Vui lòng nhập Mật khẩu.");
+                }
+
+                string normalizedEmail = info.Email.Trim().ToLower();
+                string normalizedUsername = info.Username.Trim();
+                string? normalizedPhone = string.IsNullOrWhiteSpace(info.Phone) ? null : info.Phone.Trim();
+
+                await using (SportsCenterDbContext context = new SportsCenterDbContext())
+                {
+                    bool emailExists = await context.Accounts.AnyAsync(a => a.Email.ToLower() == normalizedEmail);
+                    if (emailExists)
+                    {
+                        return (false, "Địa chỉ Email này đã được sử dụng.");
+                    }
+
+                    if (normalizedPhone != null)
+                    {
+                        bool phoneExists = await context.Accounts.AnyAsync(a => a.Phone == normalizedPhone);
+                        if (phoneExists)
+                        {
+                            return (false, "Số điện thoại này đã được sử dụng.");
+                        }
+                    }
+
+                    if (info.RoleId == 3)
+                    {
+                        bool usernameExists = await context.Members.AnyAsync(m => m.MemberCode.ToLower() == normalizedUsername.ToLower());
+                        if (usernameExists)
+                        {
+                            return (false, "Username này đã tồn tại, vui lòng chọn Username khác.");
+                        }
+                    }
+
+                    Role? role = await context.Roles.FirstOrDefaultAsync(r => r.Id == info.RoleId);
+                    if (role == null)
+                    {
+                        role = await context.Roles.FirstOrDefaultAsync(r => r.Id == 3);
+                        if (role == null)
+                        {
+                            return (false, "Không tìm thấy vai trò tài khoản hợp lệ.");
+                        }
+                    }
+
+                    string newAccountId = Guid.NewGuid().ToString();
+                    string hashedPassword = HashService.HashPasswordBCrypt(info.Password);
+
+                    Account newAccount = new Account
+                    {
+                        Id = newAccountId,
+                        Email = normalizedEmail,
+                        PasswordHash = hashedPassword,
+                        Phone = normalizedPhone,
+                        RoleId = role.Id,
+                        Status = "Active",
+                        FailedLoginCount = 0,
+                        IsLocked = false,
+                        CreatedAt = DateTime.UtcNow
+                    };
+
+                    await context.Accounts.AddAsync(newAccount);
+
+                    if (role.Id == 1)
+                    {
+                        CenterManager centerManager = new CenterManager
+                        {
+                            AccountId = newAccountId,
+                            FullName = info.FullName.Trim(),
+                            CreatedAt = DateTime.UtcNow
+                        };
+                        await context.CenterManagers.AddAsync(centerManager);
+                    }
+                    else if (role.Id == 2)
+                    {
+                        Coach coach = new Coach
+                        {
+                            AccountId = newAccountId,
+                            FullName = info.FullName.Trim(),
+                            CreatedAt = DateTime.UtcNow
+                        };
+                        await context.Coaches.AddAsync(coach);
+                    }
+                    else
+                    {
+                        Member member = new Member
+                        {
+                            AccountId = newAccountId,
+                            MemberCode = normalizedUsername,
+                            FullName = info.FullName.Trim(),
+                            CreatedAt = DateTime.UtcNow
+                        };
+                        await context.Members.AddAsync(member);
+                    }
+
+                    await context.SaveChangesAsync();
+                    return (true, "Đăng ký tài khoản thành công.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Lỗi khi đăng ký tài khoản: {ex.Message}");
             }
         }
 
@@ -96,6 +216,8 @@ namespace SportCenterManament_PRN.Services.AccountService
                         .AsNoTracking()
                         .Include(a => a.Role)
                         .Include(a => a.CenterManager)
+                        .Include(a => a.Coach)
+                        .Include(a => a.Member)
                         .FirstOrDefaultAsync(a => a.Email.ToLower() == normalizedEmail);
 
                     return account;

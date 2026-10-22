@@ -5,6 +5,7 @@ namespace SportCenterManament_PRN.Services.AuthService
 {
     public interface IAuthService
     {
+        Task<LoginResultViewModel> LoginByEmailAsync(LoginViewModel info);
         Task<LoginResultViewModel> LoginCenterManagerAsync(LoginViewModel info);
         Task<LoginResultViewModel> LoginByRoleAsync(LoginViewModel info, string roleName);
         Task<CheckTokenResultViewModel?> CheckTokenAsync(string tokenValue);

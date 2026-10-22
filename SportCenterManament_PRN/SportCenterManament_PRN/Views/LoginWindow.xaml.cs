@@ -49,12 +49,28 @@ namespace SportCenterManament_PRN.Views
                     Password = password
                 };
 
-                LoginResultViewModel result = await _authService.LoginCenterManagerAsync(loginInfo);
+                LoginResultViewModel result = await _authService.LoginByEmailAsync(loginInfo);
 
                 if (result.Success)
                 {
-                    MainWindow mainWindow = new MainWindow();
-                    mainWindow.Show();
+                    string role = UserSession.RoleName;
+
+                    if (string.Equals(role, "CenterManager", StringComparison.OrdinalIgnoreCase) || 
+                        string.Equals(role, "Manager", StringComparison.OrdinalIgnoreCase))
+                    {
+                        ManagerMainWindow managerWindow = new ManagerMainWindow();
+                        managerWindow.Show();
+                    }
+                    else if (string.Equals(role, "Coach", StringComparison.OrdinalIgnoreCase))
+                    {
+                        CoachMainWindow coachWindow = new CoachMainWindow();
+                        coachWindow.Show();
+                    }
+                    else
+                    {
+                        CustomerMainWindow customerWindow = new CustomerMainWindow();
+                        customerWindow.Show();
+                    }
 
                     this.Close();
                 }
@@ -76,11 +92,19 @@ namespace SportCenterManament_PRN.Views
             }
         }
 
+        private void btnOpenRegister_Click(object sender, RoutedEventArgs e)
+        {
+            RegisterWindow registerWindow = new RegisterWindow();
+            registerWindow.Show();
+            this.Close();
+        }
+
         private void SetLoadingState(bool isLoading)
         {
             if (isLoading)
             {
                 btnLogin.IsEnabled = false;
+                btnOpenRegister.IsEnabled = false;
                 txtEmail.IsEnabled = false;
                 txtPassword.IsEnabled = false;
                 prgLoading.Visibility = Visibility.Visible;
@@ -88,6 +112,7 @@ namespace SportCenterManament_PRN.Views
             else
             {
                 btnLogin.IsEnabled = true;
+                btnOpenRegister.IsEnabled = true;
                 txtEmail.IsEnabled = true;
                 txtPassword.IsEnabled = true;
                 prgLoading.Visibility = Visibility.Collapsed;
