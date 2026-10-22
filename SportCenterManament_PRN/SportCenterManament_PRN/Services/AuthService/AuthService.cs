@@ -18,8 +18,18 @@ namespace SportCenterManament_PRN.Services.AuthService
                 Password = password
             };
 
-            LoginResultViewModel result = await LoginByEmailAsync(info);
+            LoginResultViewModel result = await LoginAsync(info);
             return result.Success;
+        }
+
+        public async Task<LoginResultViewModel> LoginAsync(LoginViewModel info)
+        {
+            return await LoginCoreAsync(info, null);
+        }
+
+        public async Task<LoginResultViewModel> LoginByEmailAsync(LoginViewModel info)
+        {
+            return await LoginCoreAsync(info, null);
         }
 
         public async Task<LoginResultViewModel> LoginCenterManagerAsync(LoginViewModel info)
@@ -27,28 +37,88 @@ namespace SportCenterManament_PRN.Services.AuthService
             return await LoginByRoleAsync(info, "CenterManager");
         }
 
-        public async Task<LoginResultViewModel> LoginByRoleAsync(LoginViewModel info, string roleName)
+        public async Task<LoginResultViewModel> LoginCoachAsync(LoginViewModel info)
         {
-            LoginResultViewModel result = await LoginByEmailAsync(info);
-            if (!result.Success)
-            {
-                return result;
-            }
-
-            if (!string.Equals(result.Role, roleName, StringComparison.OrdinalIgnoreCase))
-            {
-                UserSession.Clear();
-                return new LoginResultViewModel
-                {
-                    Success = false,
-                    Message = $"Quyền truy cập bị từ chối. Phần mềm quản trị chỉ dành riêng cho {roleName}."
-                };
-            }
-
-            return result;
+            return await LoginByRoleAsync(info, "Coach");
         }
 
-        public async Task<LoginResultViewModel> LoginByEmailAsync(LoginViewModel info)
+        public async Task<LoginResultViewModel> LoginMemberAsync(LoginViewModel info)
+        {
+            return await LoginByRoleAsync(info, "Member");
+        }
+
+        public async Task<LoginResultViewModel> LoginReceptionistAsync(LoginViewModel info)
+        {
+            return await LoginByRoleAsync(info, "Receptionist");
+        }
+
+        public async Task<LoginResultViewModel> LoginByRoleAsync(LoginViewModel info, string roleName)
+        {
+            return await LoginCoreAsync(info, roleName);
+        }
+
+        public async Task<bool> CheckRoleAsync(string accountId, string expectedRoleName)
+        {
+            if (string.IsNullOrWhiteSpace(accountId) || string.IsNullOrWhiteSpace(expectedRoleName))
+            {
+                return false;
+            }
+
+            try
+            {
+                await using (SportsCenterDbContext context = new SportsCenterDbContext())
+                {
+                    Account? account = await context.Accounts
+                        .AsNoTracking()
+                        .Include(a => a.Role)
+                        .FirstOrDefaultAsync(a => a.Id == accountId);
+
+                    if (account == null || account.Role == null)
+                    {
+                        return false;
+                    }
+
+                    return string.Equals(account.Role.Name, expectedRoleName, StringComparison.OrdinalIgnoreCase);
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally
+            {
+            }
+        }
+
+        public async Task<string?> GetAccountRoleAsync(string accountId)
+        {
+            if (string.IsNullOrWhiteSpace(accountId))
+            {
+                return null;
+            }
+
+            try
+            {
+                await using (SportsCenterDbContext context = new SportsCenterDbContext())
+                {
+                    Account? account = await context.Accounts
+                        .AsNoTracking()
+                        .Include(a => a.Role)
+                        .FirstOrDefaultAsync(a => a.Id == accountId);
+
+                    return account?.Role?.Name;
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+            }
+        }
+
+        private async Task<LoginResultViewModel> LoginCoreAsync(LoginViewModel info, string? requiredRoleName)
         {
             try
             {
@@ -78,6 +148,16 @@ namespace SportCenterManament_PRN.Services.AuthService
                         {
                             Success = false,
                             Message = "Email hoặc mật khẩu không chính xác."
+                        };
+                    }
+
+                    if (requiredRoleName != null &&
+                        (account.Role == null || !string.Equals(account.Role.Name, requiredRoleName, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        return new LoginResultViewModel
+                        {
+                            Success = false,
+                            Message = $"Quyền truy cập bị từ chối. Vai trò yêu cầu là {requiredRoleName}."
                         };
                     }
 
@@ -182,30 +262,43 @@ namespace SportCenterManament_PRN.Services.AuthService
                 return new LoginResultViewModel
                 {
                     Success = false,
-                    Message = $"Lỗi kết nối hoặc xử lý: {ex.Message}"
+                    Message = $"Đã xảy ra lỗi khi đăng nhập: {ex.Message}"
                 };
+            }
+            finally
+            {
             }
         }
 
         public async Task<CheckTokenResultViewModel?> CheckTokenAsync(string tokenValue)
         {
-            if (string.IsNullOrWhiteSpace(tokenValue) || !UserSession.IsLoggedIn)
+            try
             {
-                return null;
-            }
+                if (string.IsNullOrWhiteSpace(tokenValue) || !Guid.TryParse(tokenValue, out Guid parsedGuid))
+                {
+                    return null;
+                }
 
-            if (UserSession.AccessToken?.ToString() == tokenValue)
-            {
+                if (!UserSession.IsLoggedIn || UserSession.AccessToken != parsedGuid)
+                {
+                    return null;
+                }
+
                 return await Task.FromResult(new CheckTokenResultViewModel
                 {
                     AccountId = UserSession.AccountId,
                     Email = UserSession.Email,
-                    FullName = UserSession.FullName,
-                    Role = UserSession.RoleName
+                    Role = UserSession.RoleName,
+                    FullName = UserSession.FullName
                 });
             }
-
-            return null;
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+            }
         }
     }
 }

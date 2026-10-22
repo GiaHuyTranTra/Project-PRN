@@ -12,8 +12,9 @@ namespace SportCenterManament_PRN.Views
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!UserSession.IsLoggedIn)
+            if (!UserSession.IsLoggedIn || !UserSession.IsMember())
             {
+                UserSession.Clear();
                 LoginWindow loginWindow = new LoginWindow();
                 loginWindow.Show();
                 this.Close();

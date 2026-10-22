@@ -49,19 +49,16 @@ namespace SportCenterManament_PRN.Views
                     Password = password
                 };
 
-                LoginResultViewModel result = await _authService.LoginByEmailAsync(loginInfo);
+                LoginResultViewModel result = await _authService.LoginAsync(loginInfo);
 
                 if (result.Success)
                 {
-                    string role = UserSession.RoleName;
-
-                    if (string.Equals(role, "CenterManager", StringComparison.OrdinalIgnoreCase) || 
-                        string.Equals(role, "Manager", StringComparison.OrdinalIgnoreCase))
+                    if (UserSession.IsCenterManager())
                     {
                         ManagerMainWindow managerWindow = new ManagerMainWindow();
                         managerWindow.Show();
                     }
-                    else if (string.Equals(role, "Coach", StringComparison.OrdinalIgnoreCase))
+                    else if (UserSession.IsCoach())
                     {
                         CoachMainWindow coachWindow = new CoachMainWindow();
                         coachWindow.Show();
