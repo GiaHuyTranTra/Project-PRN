@@ -1,0 +1,23 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace SportCenterManament_PRN.DataAccess.Entities;
+
+public partial class Coach
+{
+    public string AccountId { get; set; } = null!;
+
+    public string FullName { get; set; } = null!;
+
+    public string? Specialization { get; set; }
+
+    public string? WorkSchedule { get; set; }
+
+    public DateTime CreatedAt { get; set; }
+
+    public virtual Account Account { get; set; } = null!;
+
+    public virtual ICollection<ClassSession> ClassSessions { get; set; } = new List<ClassSession>();
+
+    public virtual ICollection<CoachDiscipline> CoachDisciplines { get; set; } = new List<CoachDiscipline>();
+}
