@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace SportCenterManament_PRN.DataAccess.Entities;
@@ -38,4 +38,6 @@ public partial class ClassRegistration
     public virtual Account RegisteredByNavigation { get; set; } = null!;
 
     public virtual ClassSession Session { get; set; } = null!;
+
+    public virtual ClassAttendance? ClassAttendance { get; set; }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace SportCenterManament_PRN.DataAccess.Entities;
@@ -50,6 +50,8 @@ public partial class ClassSession
     public virtual ICollection<ClassChangeEvent> ClassChangeEvents { get; set; } = new List<ClassChangeEvent>();
 
     public virtual ICollection<ClassRegistration> ClassRegistrations { get; set; } = new List<ClassRegistration>();
+
+    public virtual ICollection<ClassAttendance> ClassAttendances { get; set; } = new List<ClassAttendance>();
 
     public virtual Coach Coach { get; set; } = null!;
 
