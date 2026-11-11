@@ -29,5 +29,10 @@ namespace SportCenterManament_PRN.Services.CourseService
 
         Task<(bool Success, string Message)> AssignCoachAsync(
             AssignCoachViewModel model);
+
+
+        Task<(bool Success, string Message)> RestoreAsync(int id);
+
+        Task<(bool Success, string Message)> DeleteAsync(int id);
     }
 }

@@ -1,0 +1,173 @@
+﻿<UserControl x:Class="SportCenterManament_PRN.Views.CoachManagementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="#F9FAFB"
+             Loaded="UserControl_Loaded">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="QUẢN LÝ HUẤN LUYỆN VIÊN"
+                   FontSize="23"
+                   FontWeight="Bold"
+                   Foreground="#1E40AF"
+                   Margin="0,0,0,18"/>
+
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    Margin="0,0,0,14">
+
+            <TextBox x:Name="txtSearch"
+                     Width="260"
+                     Height="32"
+                     Padding="8,5"
+                     ToolTip="Tìm theo tên hoặc email"/>
+
+            <Button Content="Tìm kiếm"
+                    Width="100"
+                    Margin="10,0,0,0"
+                    Click="btnSearch_Click"/>
+
+            <Button Content="Làm mới"
+                    Width="90"
+                    Margin="8,0,0,0"
+                    Click="btnRefresh_Click"/>
+        </StackPanel>
+
+        <DataGrid x:Name="dgCoaches"
+                  Grid.Row="2"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  SelectionMode="Single"
+                  CanUserAddRows="False"
+                  SelectionChanged="dgCoaches_SelectionChanged">
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Họ tên"
+                                    Binding="{Binding FullName}"
+                                    Width="2*"/>
+
+                <DataGridTextColumn Header="Email"
+                                    Binding="{Binding Email}"
+                                    Width="2*"/>
+
+                <DataGridTextColumn Header="Số điện thoại"
+                                    Binding="{Binding Phone}"
+                                    Width="*"/>
+
+                <DataGridTextColumn Header="Bộ môn"
+                                    Binding="{Binding DisciplineNames}"
+                                    Width="2*"/>
+
+                <DataGridTextColumn Header="Trạng thái"
+                                    Binding="{Binding Status}"
+                                    Width="*"/>
+
+                <DataGridCheckBoxColumn Header="Đã khóa"
+                                        Binding="{Binding IsLocked}"
+                                        Width="75"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Border Grid.Row="3"
+                Background="White"
+                Padding="12"
+                Margin="0,12,0,0"
+                CornerRadius="6">
+
+            <StackPanel>
+                <TextBlock Text="THÔNG TIN COACH"
+                           FontWeight="Bold"
+                           Margin="0,0,0,10"/>
+
+                <WrapPanel>
+                    <StackPanel Margin="0,0,12,8">
+                        <TextBlock Text="Họ tên"/>
+                        <TextBox x:Name="txtFullName"
+                                 Width="180"
+                                 Height="30"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,12,8">
+                        <TextBlock Text="Email"/>
+                        <TextBox x:Name="txtEmail"
+                                 Width="200"
+                                 Height="30"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,12,8">
+                        <TextBlock Text="Số điện thoại"/>
+                        <TextBox x:Name="txtPhone"
+                                 Width="130"
+                                 Height="30"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,12,8">
+                        <TextBlock Text="Mật khẩu (khi thêm)"/>
+                        <PasswordBox x:Name="txtPassword"
+                                     Width="160"
+                                     Height="30"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,12,8">
+                        <TextBlock Text="Chuyên môn"/>
+                        <TextBox x:Name="txtSpecialization"
+                                 Width="180"
+                                 Height="30"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,12,8">
+                        <TextBlock Text="Lịch làm việc"/>
+                        <TextBox x:Name="txtWorkSchedule"
+                                 Width="180"
+                                 Height="30"/>
+                    </StackPanel>
+                </WrapPanel>
+
+                <TextBlock Text="Bộ môn phụ trách (chọn nhiều)"
+                           Margin="0,5,0,5"/>
+
+                <ListBox x:Name="lbDisciplines"
+                         Height="85"
+                         SelectionMode="Multiple"
+                         DisplayMemberPath="Name"
+                         SelectedValuePath="Id"/>
+
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            Margin="0,10,0,0">
+
+                    <Button Content="Thêm Coach"
+                            Width="110"
+                            Margin="5"
+                            Click="btnAdd_Click"/>
+
+                    <Button Content="Cập nhật"
+                            Width="100"
+                            Margin="5"
+                            Click="btnUpdate_Click"/>
+
+                    <Button Content="Khóa Coach"
+                            Width="105"
+                            Margin="5"
+                            Click="btnLock_Click"/>
+
+                    <Button Content="Mở khóa"
+                            Width="100"
+                            Margin="5"
+                            Click="btnUnlock_Click"/>
+
+                    <Button Content="Xóa form"
+                            Width="100"
+                            Margin="5"
+                            Click="btnClear_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

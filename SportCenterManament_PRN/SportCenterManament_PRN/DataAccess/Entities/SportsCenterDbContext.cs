@@ -60,26 +60,24 @@ public partial class SportsCenterDbContext : DbContext
     {
         if (!optionsBuilder.IsConfigured)
         {
-            try
-            {
-                string basePath = AppContext.BaseDirectory;
-                Microsoft.Extensions.Configuration.IConfigurationRoot configuration = new Microsoft.Extensions.Configuration.ConfigurationBuilder()
-                    .SetBasePath(basePath)
-                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                    .Build();
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile(
+                    "appsettings.json",
+                    optional: false,
+                    reloadOnChange: true)
+                .Build();
 
-                string? connectionString = Microsoft.Extensions.Configuration.ConfigurationExtensions.GetConnectionString(configuration, "SportsCenterConnection");
-                if (!string.IsNullOrWhiteSpace(connectionString))
-                {
-                    optionsBuilder.UseSqlServer(connectionString);
-                    return;
-                }
-            }
-            catch
+            string? connectionString =
+                configuration.GetConnectionString("DefaultConnection");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
             {
+                throw new InvalidOperationException(
+                    "Không tìm thấy DefaultConnection trong appsettings.json");
             }
 
-            optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS01;Database=SportsCenterManagement;Trusted_Connection=True;TrustServerCertificate=True;");
+            optionsBuilder.UseSqlServer(connectionString);
         }
     }
 

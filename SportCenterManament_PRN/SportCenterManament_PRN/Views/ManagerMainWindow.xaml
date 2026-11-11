@@ -108,6 +108,17 @@
                             FontSize="14"
                             Cursor="Hand"
                             Click="btnCourseManagement_Click"/>
+                    <Button x:Name="btnCoachManagement"
+        Content="Quản lý Coach"
+        Height="45"
+        Margin="0,0,0,10"
+        Background="#2563EB"
+        Foreground="White"
+        BorderThickness="0"
+        FontSize="14"
+        Cursor="Hand"
+        Click="btnCoachManagement_Click"/>
+                    
 
                 </StackPanel>
             </Border>
