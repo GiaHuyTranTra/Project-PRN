@@ -41,8 +41,10 @@
                       Margin="10,0,0,0"
                       SelectedIndex="0">
                 <ComboBoxItem Content="Tất cả" Tag="All"/>
-                <ComboBoxItem Content="Đang hoạt động" Tag="Active"/>
-                <ComboBoxItem Content="Đã ẩn" Tag="Inactive"/>
+                <ComboBoxItem Content="Bản nháp" Tag="DRAFT"/>
+                <ComboBoxItem Content="Đang hoạt động" Tag="OPEN"/>
+                <ComboBoxItem Content="Đã đóng" Tag="CLOSED"/>
+                <ComboBoxItem Content="Đã ẩn" Tag="ARCHIVED"/>
             </ComboBox>
 
             <Button Content="Tìm kiếm"
@@ -89,6 +91,9 @@
                 <DataGridTextColumn Header="Mô tả"
                                     Binding="{Binding Description}"
                                     Width="2*"/>
+                <DataGridTextColumn Header="Coach phụ trách"
+                    Binding="{Binding CoachNames}"
+                    Width="2*"/>
             </DataGrid.Columns>
         </DataGrid>
 
@@ -153,6 +158,11 @@
                             Margin="5"
                             Click="btnHide_Click"/>
 
+                    <Button Content="Hiện lại lớp"
+            Width="110"
+            Margin="5"
+            Click="btnRestore_Click"/>
+
                     <Button Content="Phân công Coach"
                             Width="140"
                             Margin="5"
@@ -162,6 +172,8 @@
                             Width="90"
                             Margin="5"
                             Click="btnClear_Click"/>
+
+                  
                 </StackPanel>
             </StackPanel>
         </Border>

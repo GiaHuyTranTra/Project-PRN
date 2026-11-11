@@ -12,6 +12,8 @@ namespace SportCenterManament_PRN.ViewModels.Course
         public string DisciplineName { get; set; } = string.Empty;
         public int Capacity { get; set; }
         public string Status { get; set; } = "Active";
+
+        public string CoachNames { get; set; } = "";
     }
 
     public class CourseSaveViewModel
