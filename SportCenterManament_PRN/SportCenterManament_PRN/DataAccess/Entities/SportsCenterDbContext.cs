@@ -71,12 +71,12 @@ public partial class SportsCenterDbContext : DbContext
                 .Build();
 
             string? connectionString =
-                configuration.GetConnectionString("DefaultConnection");
+                configuration.GetConnectionString("SportsCenterConnection");
 
             if (string.IsNullOrWhiteSpace(connectionString))
             {
                 throw new InvalidOperationException(
-                    "Không tìm thấy DefaultConnection trong appsettings.json");
+                    "Không tìm thấy SportsCenterConnection trong appsettings.json");
             }
 
             optionsBuilder.UseSqlServer(connectionString);
