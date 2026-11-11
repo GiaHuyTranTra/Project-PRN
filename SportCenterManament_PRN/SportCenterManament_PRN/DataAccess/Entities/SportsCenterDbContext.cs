@@ -32,6 +32,8 @@ public partial class SportsCenterDbContext : DbContext
 
     public virtual DbSet<ClassSession> ClassSessions { get; set; }
 
+    public virtual DbSet<Feedback> Feedbacks { get; set; }
+
     public virtual DbSet<Coach> Coaches { get; set; }
 
     public virtual DbSet<CoachDiscipline> CoachDisciplines { get; set; }
@@ -254,6 +256,31 @@ public partial class SportsCenterDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(e => e.MarkedBy)
                 .HasConstraintName("FK_ClassAttendance_MarkedBy");
+        });
+
+        modelBuilder.Entity<Feedback>(entity =>
+        {
+            entity.ToTable("Feedback", table =>
+                table.HasCheckConstraint(
+                    "CK_Feedback_Rating",
+                    "[Rating] >= 1 AND [Rating] <= 5"));
+
+            entity.HasKey(e => e.Id).HasName("PK_Feedback");
+
+            entity.HasIndex(e => e.ClassAttendanceId)
+                .IsUnique()
+                .HasDatabaseName("UQ_Feedback_ClassAttendance");
+
+            entity.Property(e => e.Comment).HasMaxLength(1000);
+            entity.Property(e => e.CreatedAt)
+                .HasColumnType("datetime2(7)")
+                .HasDefaultValueSql("(sysutcdatetime())");
+
+            entity.HasOne(e => e.ClassAttendance)
+                .WithOne(e => e.Feedback)
+                .HasForeignKey<Feedback>(e => e.ClassAttendanceId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Feedback_ClassAttendance");
         });
 
         modelBuilder.Entity<ClassChangeEvent>(entity =>

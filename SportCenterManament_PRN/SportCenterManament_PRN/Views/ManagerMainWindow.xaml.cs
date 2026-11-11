@@ -74,6 +74,17 @@ namespace SportCenterManament_PRN.Views
             mainContent.Content = new CoachManagementView();
         }
 
+        private void btnFeedback_Click(
+            object sender,
+            RoutedEventArgs e)
+        {
+            FeedbackWindow feedbackWindow = new FeedbackWindow
+            {
+                Owner = this
+            };
+            feedbackWindow.ShowDialog();
+        }
+
         private void btnLogout_Click(
             object sender,
             RoutedEventArgs e)

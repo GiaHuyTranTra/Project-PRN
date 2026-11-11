@@ -29,6 +29,16 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Button Content="Đánh giá &amp; phản hồi"
+                            Background="#059669"
+                            Foreground="White"
+                            FontWeight="Medium"
+                            FontSize="12"
+                            Padding="12,6"
+                            Margin="0,0,16,0"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            Click="btnFeedback_Click"/>
                     <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
                         <TextBlock x:Name="txtUserName" Text="Coach Name" FontSize="13" FontWeight="SemiBold" Foreground="#FFFFFF" HorizontalAlignment="Right"/>
                         <TextBlock x:Name="txtUserRole" Text="Coach" FontSize="11" Foreground="#A7F3D0" HorizontalAlignment="Right"/>
