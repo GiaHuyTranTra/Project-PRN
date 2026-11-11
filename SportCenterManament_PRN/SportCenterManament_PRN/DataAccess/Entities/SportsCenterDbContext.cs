@@ -26,6 +26,8 @@ public partial class SportsCenterDbContext : DbContext
 
     public virtual DbSet<ClassChangeEvent> ClassChangeEvents { get; set; }
 
+    public virtual DbSet<ClassAttendance> ClassAttendances { get; set; }
+
     public virtual DbSet<ClassRegistration> ClassRegistrations { get; set; }
 
     public virtual DbSet<ClassSession> ClassSessions { get; set; }
@@ -215,6 +217,45 @@ public partial class SportsCenterDbContext : DbContext
                 .HasForeignKey(d => d.DisciplineId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Class_Discipline");
+        });
+
+        modelBuilder.Entity<ClassAttendance>(entity =>
+        {
+            entity.ToTable("ClassAttendance");
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.ClassRegistrationId).IsUnique();
+
+            entity.Property(e => e.MemberId)
+                .HasMaxLength(400)
+                .IsUnicode(false);
+            entity.Property(e => e.MarkedBy)
+                .HasMaxLength(400)
+                .IsUnicode(false);
+            entity.Property(e => e.Notes).HasMaxLength(500);
+            entity.Property(e => e.MarkedAt).HasColumnType("datetime2(7)");
+
+            entity.HasOne(e => e.ClassRegistration)
+                .WithOne(e => e.ClassAttendance)
+                .HasForeignKey<ClassAttendance>(e => e.ClassRegistrationId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ClassAttendance_Registration");
+
+            entity.HasOne(e => e.Session)
+                .WithMany(e => e.ClassAttendances)
+                .HasForeignKey(e => e.SessionId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ClassAttendance_Session");
+
+            entity.HasOne(e => e.Member)
+                .WithMany(e => e.ClassAttendances)
+                .HasForeignKey(e => e.MemberId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ClassAttendance_Member");
+
+            entity.HasOne<Account>()
+                .WithMany()
+                .HasForeignKey(e => e.MarkedBy)
+                .HasConstraintName("FK_ClassAttendance_MarkedBy");
         });
 
         modelBuilder.Entity<ClassChangeEvent>(entity =>

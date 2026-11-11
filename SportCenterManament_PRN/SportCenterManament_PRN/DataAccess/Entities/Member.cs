@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace SportCenterManament_PRN.DataAccess.Entities;
@@ -20,6 +20,8 @@ public partial class Member
     public virtual Account Account { get; set; } = null!;
 
     public virtual ICollection<ClassRegistration> ClassRegistrations { get; set; } = new List<ClassRegistration>();
+
+    public virtual ICollection<ClassAttendance> ClassAttendances { get; set; } = new List<ClassAttendance>();
 
     public virtual MemberSubscription? MemberSubscription { get; set; }
 
