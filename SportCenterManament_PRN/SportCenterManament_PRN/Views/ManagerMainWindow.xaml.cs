@@ -85,6 +85,17 @@ namespace SportCenterManament_PRN.Views
             feedbackWindow.ShowDialog();
         }
 
+        private void btnAttendance_Click(
+            object sender,
+            RoutedEventArgs e)
+        {
+            AttendanceWindow attendanceWindow = new AttendanceWindow
+            {
+                Owner = this
+            };
+            attendanceWindow.ShowDialog();
+        }
+
         private void btnLogout_Click(
             object sender,
             RoutedEventArgs e)

@@ -70,6 +70,10 @@ public partial class SportsCenterDbContext : DbContext
                     "appsettings.json",
                     optional: false,
                     reloadOnChange: true)
+                .AddJsonFile(
+                    "appsettings.Local.json",
+                    optional: true,
+                    reloadOnChange: true)
                 .Build();
 
             string? connectionString =

@@ -13,6 +13,9 @@
 *.ide/
 *.sw?
 
+## Per-developer database connection override
+**/appsettings.Local.json
+
 ## Operating System
 Thumbs.db
 ehthumbs.db
