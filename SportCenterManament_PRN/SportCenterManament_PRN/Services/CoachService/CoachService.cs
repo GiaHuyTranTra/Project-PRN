@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SportCenterManament_PRN.DataAccess.Entities;
+using SportCenterManament_PRN.Services.AccountService;
 using SportCenterManament_PRN.ViewModels.Coach;
 using SportCenterManament_PRN.ViewModels.Course;
 using System;
@@ -15,7 +16,7 @@ namespace SportCenterManament_PRN.Services.CoachService
     {
         private const string ActiveStatus = "Active";
 
-        private static string HashPassword(string password)
+      /*  private static string HashPassword(string password)
         {
             // PHẢI đồng bộ với cách kiểm tra mật khẩu
             // trong AuthService của project.
@@ -23,7 +24,7 @@ namespace SportCenterManament_PRN.Services.CoachService
 
             return hasher.HashPassword(
                 new Account(), password);
-        }
+        }*/
 
         public async Task<List<CoachItemViewModel>>
             GetAllAsync(string? keyword)
@@ -106,8 +107,7 @@ namespace SportCenterManament_PRN.Services.CoachService
                 .ToListAsync();
         }
 
-        public async Task<(bool Success, string Message)>
-            CreateAsync(CoachSaveViewModel model)
+        public async Task<(bool Success, string Message)> CreateAsync(CoachSaveViewModel model)
         {
             if (string.IsNullOrWhiteSpace(model.FullName) ||
                 string.IsNullOrWhiteSpace(model.Email) ||
@@ -156,7 +156,7 @@ namespace SportCenterManament_PRN.Services.CoachService
                 Id = accountId,
                 Email = email,
                 Phone = model.Phone?.Trim(),
-                PasswordHash = HashPassword(model.Password),
+                PasswordHash = HashService.GenerateSHA512(model.Password),
                 RoleId = coachRole.Id,
                 Status = ActiveStatus,
                 IsLocked = false,
