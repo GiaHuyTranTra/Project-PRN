@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using SportCenterManament_PRN.Services.AuthService;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -32,11 +34,26 @@ namespace SportCenterManament_PRN.Services.AccountService
             }
         }
 
-        public async Task<(bool Success, string Message)> RegisterAccountAsync(RegisterViewModel info)
+        public Task<(bool Success, string Message)> RegisterAccountAsync(RegisterViewModel info)
+        {
+            return CreateAccountAsync(info, 3);
+        }
+
+        public Task<(bool Success, string Message)> CreateCoachAsync(RegisterViewModel info)
+        {
+            if (!UserSession.IsLoggedIn || !UserSession.IsCenterManager())
+            {
+                return Task.FromResult((false, "Chỉ quản lý trung tâm mới có quyền thêm huấn luyện viên."));
+            }
+
+            return CreateAccountAsync(info, 2);
+        }
+
+        private async Task<(bool Success, string Message)> CreateAccountAsync(RegisterViewModel info, int roleId)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(info.Username))
+                if (roleId == 3 && string.IsNullOrWhiteSpace(info.Username))
                 {
                     return (false, "Vui lòng nhập Username.");
                 }
@@ -55,6 +72,12 @@ namespace SportCenterManament_PRN.Services.AccountService
                 string normalizedUsername = info.Username.Trim();
                 string? normalizedPhone = string.IsNullOrWhiteSpace(info.Phone) ? null : info.Phone.Trim();
 
+                if (normalizedPhone != null &&
+                    (normalizedPhone.Length != 10 || normalizedPhone.Any(c => !char.IsAsciiDigit(c))))
+                {
+                    return (false, "Số điện thoại phải gồm đúng 10 chữ số.");
+                }
+
                 await using (SportsCenterDbContext context = new SportsCenterDbContext())
                 {
                     bool emailExists = await context.Accounts.AnyAsync(a => a.Email.ToLower() == normalizedEmail);
@@ -72,7 +95,7 @@ namespace SportCenterManament_PRN.Services.AccountService
                         }
                     }
 
-                    if (info.RoleId == 3)
+                    if (roleId == 3)
                     {
                         bool usernameExists = await context.Members.AnyAsync(m => m.MemberCode.ToLower() == normalizedUsername.ToLower());
                         if (usernameExists)
@@ -81,14 +104,10 @@ namespace SportCenterManament_PRN.Services.AccountService
                         }
                     }
 
-                    Role? role = await context.Roles.FirstOrDefaultAsync(r => r.Id == info.RoleId);
+                    Role? role = await context.Roles.FirstOrDefaultAsync(r => r.Id == roleId);
                     if (role == null)
                     {
-                        role = await context.Roles.FirstOrDefaultAsync(r => r.Id == 3);
-                        if (role == null)
-                        {
-                            return (false, "Không tìm thấy vai trò tài khoản hợp lệ.");
-                        }
+                        return (false, "Không tìm thấy vai trò tài khoản hợp lệ.");
                     }
 
                     string newAccountId = Guid.NewGuid().ToString();
@@ -109,17 +128,7 @@ namespace SportCenterManament_PRN.Services.AccountService
 
                     await context.Accounts.AddAsync(newAccount);
 
-                    if (role.Id == 1)
-                    {
-                        CenterManager centerManager = new CenterManager
-                        {
-                            AccountId = newAccountId,
-                            FullName = info.FullName.Trim(),
-                            CreatedAt = DateTime.UtcNow
-                        };
-                        await context.CenterManagers.AddAsync(centerManager);
-                    }
-                    else if (role.Id == 2)
+                    if (role.Id == 2)
                     {
                         Coach coach = new Coach
                         {
@@ -147,7 +156,8 @@ namespace SportCenterManament_PRN.Services.AccountService
             }
             catch (Exception ex)
             {
-                return (false, $"Lỗi khi đăng ký tài khoản: {ex.Message}");
+                Trace.TraceError("Account registration failed: {0}", ex);
+                return (false, "Không thể đăng ký tài khoản. Vui lòng thử lại.");
             }
         }
 

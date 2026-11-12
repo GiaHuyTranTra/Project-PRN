@@ -9,6 +9,7 @@ namespace SportCenterManament_PRN.Services.AccountService
     {
         Task<bool> IsDuplicateAsync(string email, string phone);
         Task<bool> CreateCenterManagerAsync(AccountViewModel info);
+        Task<(bool Success, string Message)> CreateCoachAsync(RegisterViewModel info);
         Task<(bool Success, string Message)> RegisterAccountAsync(RegisterViewModel info);
         Task<Account?> GetAccountByEmailAsync(string email);
         Task<bool> LockAccountAsync(string accountId);

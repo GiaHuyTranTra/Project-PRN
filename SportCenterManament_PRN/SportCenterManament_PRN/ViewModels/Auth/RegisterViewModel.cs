@@ -25,6 +25,5 @@ namespace SportCenterManament_PRN.ViewModels.Auth
 
         public string? Phone { get; set; }
 
-        public int RoleId { get; set; } = 3;
     }
 }

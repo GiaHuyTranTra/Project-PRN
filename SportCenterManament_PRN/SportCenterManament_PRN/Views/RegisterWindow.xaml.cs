@@ -1,6 +1,5 @@
 using System;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using SportCenterManament_PRN.Services.AccountService;
 using SportCenterManament_PRN.ViewModels.Auth;
@@ -11,11 +10,32 @@ namespace SportCenterManament_PRN.Views
     {
         private readonly IAccountService _accountService;
 
-        public RegisterWindow()
+        private readonly bool _createCoach;
+
+        public RegisterWindow() : this(false)
+        {
+        }
+
+        internal RegisterWindow(bool createCoach)
         {
             InitializeComponent();
             _accountService = new AccountService();
-            txtUsername.Focus();
+            _createCoach = createCoach;
+            if (_createCoach)
+            {
+                Title = "Thêm huấn luyện viên";
+                lblTitle.Text = "THÊM HUẤN LUYỆN VIÊN";
+                lblSubtitle.Visibility = Visibility.Collapsed;
+                lblUsername.Visibility = Visibility.Collapsed;
+                txtUsername.Visibility = Visibility.Collapsed;
+                btnRegister.Content = "Tạo tài khoản Coach";
+                btnBackToLogin.Content = "Đóng";
+                txtFullName.Focus();
+            }
+            else
+            {
+                txtUsername.Focus();
+            }
         }
 
         private async void btnRegister_Click(object sender, RoutedEventArgs e)
@@ -30,7 +50,7 @@ namespace SportCenterManament_PRN.Views
             string confirmPassword = txtConfirmPassword.Password;
             string phone = txtPhone.Text.Trim();
 
-            if (string.IsNullOrWhiteSpace(username))
+            if (!_createCoach && string.IsNullOrWhiteSpace(username))
             {
                 ShowMessage("Vui lòng nhập Username.", false);
                 txtUsername.Focus();
@@ -72,13 +92,6 @@ namespace SportCenterManament_PRN.Views
                 return;
             }
 
-            int roleId = 3;
-            ComboBoxItem? selectedItem = cboRole.SelectedItem as ComboBoxItem;
-            if (selectedItem != null && selectedItem.Tag != null)
-            {
-                int.TryParse(selectedItem.Tag.ToString(), out roleId);
-            }
-
             SetLoading(true);
 
             try
@@ -90,14 +103,22 @@ namespace SportCenterManament_PRN.Views
                     Email = email,
                     Password = password,
                     ConfirmPassword = confirmPassword,
-                    Phone = string.IsNullOrWhiteSpace(phone) ? null : phone,
-                    RoleId = roleId
+                    Phone = string.IsNullOrWhiteSpace(phone) ? null : phone
                 };
 
-                (bool Success, string Message) result = await _accountService.RegisterAccountAsync(registerInfo);
+                (bool Success, string Message) result = _createCoach
+                    ? await _accountService.CreateCoachAsync(registerInfo)
+                    : await _accountService.RegisterAccountAsync(registerInfo);
 
                 if (result.Success)
                 {
+                    if (_createCoach)
+                    {
+                        MessageBox.Show(this, "Tạo tài khoản Coach thành công.");
+                        Close();
+                        return;
+                    }
+
                     MessageBox.Show("Đăng ký tài khoản thành công!\nHãy sử dụng Email vừa tạo để đăng nhập vào hệ thống.", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
                     
                     LoginWindow loginWindow = new LoginWindow();
@@ -122,6 +143,12 @@ namespace SportCenterManament_PRN.Views
 
         private void btnBackToLogin_Click(object sender, RoutedEventArgs e)
         {
+            if (_createCoach)
+            {
+                Close();
+                return;
+            }
+
             LoginWindow loginWindow = new LoginWindow();
             loginWindow.Show();
             this.Close();
@@ -137,7 +164,6 @@ namespace SportCenterManament_PRN.Views
             txtPassword.IsEnabled = !isLoading;
             txtConfirmPassword.IsEnabled = !isLoading;
             txtPhone.IsEnabled = !isLoading;
-            cboRole.IsEnabled = !isLoading;
             prgLoading.Visibility = isLoading ? Visibility.Visible : Visibility.Collapsed;
         }
 

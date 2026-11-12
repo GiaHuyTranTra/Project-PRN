@@ -25,6 +25,12 @@ namespace SportCenterManament_PRN.Views
             txtUserRole.Text = UserSession.RoleName;
         }
 
+        private void btnAddCoach_Click(object sender, RoutedEventArgs e)
+        {
+            RegisterWindow coachWindow = new RegisterWindow(createCoach: true) { Owner = this };
+            coachWindow.ShowDialog();
+        }
+
         private void btnLogout_Click(object sender, RoutedEventArgs e)
         {
             UserSession.Clear();

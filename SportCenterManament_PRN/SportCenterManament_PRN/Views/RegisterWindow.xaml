@@ -69,20 +69,20 @@
                 </Border.Effect>
                 
                 <StackPanel>
-                    <TextBlock Text="TẠO TÀI KHOẢN MỚI" 
+                    <TextBlock x:Name="lblTitle" Text="ĐĂNG KÝ HỘI VIÊN"
                                FontSize="20" 
                                FontWeight="Bold" 
                                Foreground="#1E40AF" 
                                HorizontalAlignment="Center" 
                                Margin="0,0,0,4"/>
 
-                    <TextBlock Text="Đăng ký tài khoản hệ thống Sports Center" 
+                    <TextBlock x:Name="lblSubtitle" Text="Đăng ký tài khoản hệ thống Sports Center"
                                FontSize="12" 
                                Foreground="#6B7280" 
                                HorizontalAlignment="Center" 
                                Margin="0,0,0,16"/>
 
-                    <TextBlock Text="Username (Tên người dùng)" 
+                    <TextBlock x:Name="lblUsername" Text="Username (Tên người dùng)"
                                FontSize="12" 
                                FontWeight="Medium" 
                                Foreground="#374151" 
@@ -135,21 +135,6 @@
                     <TextBox x:Name="txtPhone" 
                              Style="{StaticResource ModernTextBox}" 
                              Margin="0,0,0,10"/>
-
-                    <TextBlock Text="Vai trò (Role)" 
-                               FontSize="12" 
-                               FontWeight="Medium" 
-                               Foreground="#374151" 
-                               Margin="0,0,0,4"/>
-                    <ComboBox x:Name="cboRole" 
-                              Height="34" 
-                              FontSize="13" 
-                              Margin="0,0,0,14" 
-                              SelectedIndex="0">
-                        <ComboBoxItem Content="Hội viên / Khách hàng (Member / Customer)" Tag="3"/>
-                        <ComboBoxItem Content="Huấn luyện viên (Coach)" Tag="2"/>
-                        <ComboBoxItem Content="Quản lý trung tâm (CenterManager)" Tag="1"/>
-                    </ComboBox>
 
                     <Border x:Name="bdrMessage" 
                             Background="#FEE2E2" 
