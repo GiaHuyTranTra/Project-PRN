@@ -10,29 +10,34 @@ namespace SportCenterManament_PRN.Views
             InitializeComponent();
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void Window_Loaded(
+            object sender,
+            RoutedEventArgs e)
         {
-            if (!UserSession.IsLoggedIn || !UserSession.IsCoach())
+            if (!UserSession.IsLoggedIn ||
+                !UserSession.IsCoach())
             {
-                UserSession.Clear();
-                LoginWindow loginWindow = new LoginWindow();
-                loginWindow.Show();
-                this.Close();
+                MessageBox.Show(
+                    "Chỉ Coach mới được truy cập trang này.");
+
+                new LoginWindow().Show();
+                Close();
                 return;
             }
 
-            txtUserName.Text = UserSession.FullName;
-            txtUserRole.Text = UserSession.RoleName;
+            txtFullName.Text = UserSession.FullName;
+
+            mainContent.Content =
+                new CoachDashboardView();
         }
 
         private void btnLogout_Click(object sender, RoutedEventArgs e)
         {
             UserSession.Clear();
 
-            LoginWindow loginWindow = new LoginWindow();
-            loginWindow.Show();
+            new LoginWindow().Show();
 
-            this.Close();
+            Close();
         }
     }
 }

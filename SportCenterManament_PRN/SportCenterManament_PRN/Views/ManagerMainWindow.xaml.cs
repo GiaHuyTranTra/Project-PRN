@@ -8,7 +8,7 @@ namespace SportCenterManament_PRN.Views
     {
         // TRUE: Bỏ qua kiểm tra quyền để test
         // FALSE: Chỉ Admin và CenterManager được truy cập
-        private const bool IsTesting = false
+        private const bool IsTesting = true
             ;
 
         public ManagerMainWindow()
