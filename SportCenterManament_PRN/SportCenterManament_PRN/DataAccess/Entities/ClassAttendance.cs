@@ -11,8 +11,6 @@ public partial class ClassAttendance
     public string? MarkedBy { get; set; }
     public DateTime? MarkedAt { get; set; }
 
-    public virtual Feedback? Feedback { get; set; }
-
     public virtual ClassRegistration ClassRegistration { get; set; } = null!;
     public virtual ClassSession Session { get; set; } = null!;
     public virtual Member Member { get; set; } = null!;

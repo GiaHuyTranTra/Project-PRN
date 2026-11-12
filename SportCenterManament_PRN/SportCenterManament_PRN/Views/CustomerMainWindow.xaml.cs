@@ -35,13 +35,5 @@ namespace SportCenterManament_PRN.Views
             this.Close();
         }
 
-        private void btnFeedback_Click(object sender, RoutedEventArgs e)
-        {
-            FeedbackWindow feedbackWindow = new FeedbackWindow
-            {
-                Owner = this
-            };
-            feedbackWindow.ShowDialog();
-        }
     }
 }
