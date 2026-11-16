@@ -10,6 +10,19 @@ namespace SportCenterManament_PRN.Services.AuthService
 {
     public class AuthService : IAuthService
     {
+        private readonly Func<SportsCenterDbContext> _createContext;
+
+        public AuthService() : this(() => new SportsCenterDbContext())
+        {
+        }
+
+        // Allows automated tests to supply an isolated database without changing
+        // the application's normal SQL Server configuration.
+        public AuthService(Func<SportsCenterDbContext> createContext)
+        {
+            _createContext = createContext ?? throw new ArgumentNullException(nameof(createContext));
+        }
+
         public async Task<bool> AuthenticateAsync(string email, string password)
         {
             LoginViewModel info = new LoginViewModel
@@ -66,7 +79,7 @@ namespace SportCenterManament_PRN.Services.AuthService
 
             try
             {
-                await using (SportsCenterDbContext context = new SportsCenterDbContext())
+                await using (SportsCenterDbContext context = _createContext())
                 {
                     Account? account = await context.Accounts
                         .AsNoTracking()
@@ -99,7 +112,7 @@ namespace SportCenterManament_PRN.Services.AuthService
 
             try
             {
-                await using (SportsCenterDbContext context = new SportsCenterDbContext())
+                await using (SportsCenterDbContext context = _createContext())
                 {
                     Account? account = await context.Accounts
                         .AsNoTracking()
@@ -133,7 +146,7 @@ namespace SportCenterManament_PRN.Services.AuthService
 
                 string normalizedEmail = info.Email.Trim().ToLower();
 
-                await using (SportsCenterDbContext context = new SportsCenterDbContext())
+                await using (SportsCenterDbContext context = _createContext())
                 {
                     Account? account = await context.Accounts
                         .Include(q => q.Role)

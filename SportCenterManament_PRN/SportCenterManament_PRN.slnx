@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="SportCenterManament_PRN/SportCenterManament_PRN.csproj" />
+  <Project Path="SportCenterManament_PRN.Tests/SportCenterManament_PRN.Tests.csproj" />
 </Solution>
